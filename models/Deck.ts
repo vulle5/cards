@@ -16,8 +16,8 @@ class Deck {
     return this.#cards;
   }
   
-  draw(): Card | null {
-    return this.#cards.pop() ?? null;
+  draw(): Card | undefined {
+    return this.#cards.pop();
   }
 
   add(card: Card): Deck {
