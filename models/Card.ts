@@ -22,26 +22,31 @@ export enum Value {
 }
 
 class Card {
-  readonly value: Value
-  readonly suit: Suit
+  readonly value: Value;
+  readonly suit: Suit;
 
   constructor(value: Value, suit: Suit) {
-    this.value = value
-    this.suit = suit
+    this.value = value;
+    this.suit = suit;
   }
 
   static random(): Card {
-    const value = Object.values(Value)[Math.floor(Math.random() * Object.values(Value).length)]
+    const value =
+      Object.values(Value)[
+        Math.floor(Math.random() * Object.values(Value).length)
+      ];
 
-    const enumIndexes = Object.values(Suit).map(n => Number.parseInt(n as string)).filter(n => !Number.isNaN(n))
-    const suit = enumIndexes[Math.floor(Math.random() * enumIndexes.length)]
+    const enumIndexes = Object.values(Suit)
+      .map((n) => Number.parseInt(n as string))
+      .filter((n) => !Number.isNaN(n));
+    const suit = enumIndexes[Math.floor(Math.random() * enumIndexes.length)];
 
-    return new Card(value, suit)
+    return new Card(value, suit);
   }
 
   toString(): string {
-    return `${this.value} of ${Suit[this.suit]}s`
+    return `${this.value} of ${Suit[this.suit]}s`;
   }
 }
 
-export default Card
+export default Card;
