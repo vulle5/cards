@@ -1,7 +1,7 @@
-import Card, { Value, Suit } from "./Card.ts";
+import FrenchCard, { Value, Suit } from "./FrenchCard.ts";
 import CardDeck from "./CardDeck.ts";
 
-class PokerDeck extends CardDeck {
+class PokerDeck extends CardDeck<FrenchCard> {
   constructor() {
     // Create a uniq deck of cards that is in order
     const value = Object.values(Value);
@@ -9,7 +9,7 @@ class PokerDeck extends CardDeck {
     const cards = [];
     for (let i = 0; i < suit.length; i++) {
       for (let j = 0; j < value.length; j++) {
-        cards.push(new Card(value[j], suit[i]));
+        cards.push(new FrenchCard(value[j], suit[i]));
       }
     }
     super(cards);

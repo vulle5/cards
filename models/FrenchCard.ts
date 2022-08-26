@@ -21,7 +21,7 @@ export enum Value {
   Ace = "A",
 }
 
-class Card {
+class FrenchCard {
   readonly value: Value;
   readonly suit: Suit;
 
@@ -30,7 +30,7 @@ class Card {
     this.suit = suit;
   }
 
-  static random(): Card {
+  static random(): FrenchCard {
     const value =
       Object.values(Value)[
         Math.floor(Math.random() * Object.values(Value).length)
@@ -41,7 +41,7 @@ class Card {
       .filter((n) => !Number.isNaN(n));
     const suit = enumIndexes[Math.floor(Math.random() * enumIndexes.length)];
 
-    return new Card(value, suit);
+    return new FrenchCard(value, suit);
   }
 
   toString(): string {
@@ -49,4 +49,4 @@ class Card {
   }
 }
 
-export default Card;
+export default FrenchCard;
