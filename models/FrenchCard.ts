@@ -38,7 +38,6 @@ class FrenchCard {
 
     const enumIndexes = Object.values(Suit)
       .map((n) => Number.parseInt(n as string))
-      .filter((n) => !Number.isNaN(n));
     const suit = enumIndexes[Math.floor(Math.random() * enumIndexes.length)];
 
     return new FrenchCard(value, suit);
