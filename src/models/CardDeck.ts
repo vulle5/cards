@@ -29,12 +29,28 @@ class CardDeck<T> {
   }
 
   /**
+   * Draw a number of cards from the top of the deck.
+   * @param count The number of cards to draw.
+   * @returns An array of cards, or an empty array if the deck is empty.
+   */
+  drawMany(count: number): T[] {
+    const cards: T[] = [];
+    for (let i = 0; i < count; i++) {
+      const card = this.draw();
+      if (card) {
+        cards.push(card);
+      }
+    }
+    return cards;
+  }
+
+  /**
    * Adds card to the bottom of the deck.
    * @param card The card to add.
    * @returns The deck after addition.
    */
   add(card: T): CardDeck<T> {
-    this.#cards.push(card)
+    this.#cards.unshift(card)
     return this
   }
 
