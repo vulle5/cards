@@ -1,5 +1,3 @@
-import { assert } from "../deps.ts";
-
 import Blinds from "./Blinds.ts";
 import FrenchCard, { Value } from "./FrenchCard.ts";
 import Player from "./Player.ts";
@@ -29,8 +27,6 @@ class PokerGame {
     this.#blinds = blinds;
     this.#handSize = handSize;
     this.#betLimit = betLimit;
-
-    assert(this.#players.length > 1, "Must have at least 2 players");
   }
 }
 
