@@ -22,6 +22,14 @@ class PokerPlayer<T> {
 
     this.#chips = amount;
   }
+
+  /**
+   * Checks if the player has chips and has not folded.
+   * @returns true if the player has chips and folded is falsy.
+   */
+  canPlay() {
+    return !this.folded && this.#chips > 0;
+  }
 }
 
 interface PlayerParameters<T> {

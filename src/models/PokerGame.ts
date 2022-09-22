@@ -89,8 +89,22 @@ class PokerGame {
   }
 
   // TODO: Add unique ID to players
+  /**
+   * Checks if a player is in the game.
+   * @param player The player to check.
+   * @returns true if the player is in the game.
+   */
   playerInGame(player: PokerPlayer<FrenchCard>): boolean {
     return this.#players.some(p => p.name === player.name);
+  }
+
+  /**
+   * Checks if player is active (not folded and has chips).
+   * @param player The player to check.
+   * @returns true if the player is active.
+   */
+  playerActive(player: PokerPlayer<FrenchCard>): boolean {
+    return player.canPlay() && this.playerInGame(player);
   }
 
   gameFull(): boolean {
@@ -124,8 +138,7 @@ class PokerGame {
    * @throws Error if the player has already folded.
   */
   bet(player: PokerPlayer<FrenchCard>, amount: number) {
-    assert(this.playerInGame(player), "Player is not in the game.");
-    assert(!player.folded, "Player has already folded.");
+    assert(this.playerActive(player), "Player is not active.");
 
     const playerGoesAllIn = amount >= player.chips;
     if (playerGoesAllIn) {
@@ -146,8 +159,7 @@ class PokerGame {
    * @throws Error if the player has already folded.
   */
   fold(player: PokerPlayer<FrenchCard>) {
-    assert(this.playerInGame(player), "Player is not in the game.");
-    assert(!player.folded, "Player has already folded.");
+    assert(this.playerActive(player), "Player is not active.");
 
     player.folded = true;
     player.cards = [];
@@ -156,8 +168,10 @@ class PokerGame {
   // TODO: Add support for other poker variants
 
   start() {
+    // TODO: Rotate blinds and dealer
     this.#deck.shuffle();
     this.#deal();
+    // TODO: Collect blinds to pot
   }
 
   rotatePlayers() {
