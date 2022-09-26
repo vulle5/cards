@@ -9,9 +9,8 @@ const pokerGame = new PokerGame({
     new PokerPlayer<FrenchCard>('Player 2', { chips: 500 }),
     new PokerPlayer<FrenchCard>('Player 3', { chips: 750 }),
   ],
-  blinds: new Blinds({ smallBlind: 100, bigBlind: 200, ante: 50 }),
-  handSize: 2,
-  betLimit: 100,
+  blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
+  handSize: 2
 });
 
 pokerGame.start();

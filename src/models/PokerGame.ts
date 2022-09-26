@@ -5,41 +5,35 @@ import PokerPlayer from "./PokerPlayer.ts";
 import PokerDeck from "./PokerDeck.ts";
 
 class PokerGame {
-  #players: PokerPlayer<FrenchCard>[];
+  blinds: Blinds;
+  #board: FrenchCard[] = [];
   #cardRanks: Value[];
   #deck: PokerDeck;
-  #board: FrenchCard[] = [];
-  #pot = 0;
   #handSize = 2;
-  blinds: Blinds;
-  #betLimit;
   #maxPlayers;
+  #minBet = 0;
+  #players: PokerPlayer<FrenchCard>[];
+  #pot = 0;
 
   constructor({
-    players,
+    blinds = new Blinds(),
     cardRanks = defaultCardRanks,
     deck = new PokerDeck(),
-    blinds = new Blinds(),
     maxPlayers = 8,
-    betLimit = 0,
+    players
   }: PokerGameParameters) {
-    this.#players = players;
+    this.blinds = blinds;
     this.#cardRanks = cardRanks;
     this.#deck = deck;
-    this.blinds = blinds;
     this.#maxPlayers = maxPlayers;
-    this.#betLimit = betLimit;
+    this.#players = players;
 
     assert(this.#maxPlayers > 1, "Max players must be greater than 1.");
-    // TODO: Add support for 2 players
+    // TODO: Add support for fewer than 3 players
     assert(this.#players.length > 2, "Must have at least 3 players.");
     assert(
       this.#players.length <= this.#maxPlayers,
       `Too many players. Max is ${this.#maxPlayers}.`
-    );
-    assert(
-      this.#betLimit >= 0,
-      "Bet limit must be greater than or equal to 0."
     );
   }
 
@@ -68,26 +62,6 @@ class PokerGame {
     return this.#players.at(0) as PokerPlayer<FrenchCard>;
   }
 
-  get betLimit() {
-    return this.#betLimit;
-  }
-  set betLimit(limit: number) {
-    assert(limit >= 0, "Bet limit must be greater than or equal to 0.");
-    this.#betLimit = limit;
-  }
-
-  #deal() {
-    this.#players.forEach((player) => {
-      player.cards = this.#deck.drawMany(this.#handSize);
-    });
-  }
-
-  #reset() {
-    this.#deck = new PokerDeck();
-    this.#board = [];
-    this.#pot = 0;
-  }
-
   // TODO: Add unique ID to players
   /**
    * Checks if a player is in the game.
@@ -111,8 +85,13 @@ class PokerGame {
     return this.#players.length >= this.#maxPlayers;
   }
 
-  noLimitBetting(): boolean {
-    return this.#betLimit === 0;
+  /**
+   * Amount is over or equal the minimum bet or minimum bet is zero.
+   * @param amount The amount to bet.
+   * @returns true if the amount is over or equal to the minimum bet or minimum bet is zero.
+   */
+  overOrEqualMinBet(amount: number): boolean {
+    return amount >= this.#minBet || this.#minBet === 0;
   }
 
   /**
@@ -129,10 +108,11 @@ class PokerGame {
   }
 
   /**
-   * Bet an amount of chips.
+   * Bet an amount of chips. Bets player's entire chip stack if they don't have enough chips.
    * @param player The player betting.
    * @param amount The amount of chips to bet.
    * @throws Error if amount is less than zero.
+   * @throws Error if amount is less than minimum bet.
    * @throws Error if the player is not in the game.
    * @throws Error if the player does not have enough chips.
    * @throws Error if the player has already folded.
@@ -145,10 +125,10 @@ class PokerGame {
       this.#pot += player.chips;
       player.chips -= player.chips;
     } else {
-      if (this.noLimitBetting() || amount >= this.#betLimit) {
-        player.chips -= amount;
-        this.#pot += amount;
-      }
+      assert(this.overOrEqualMinBet(amount), `Bet is too small. Min bet is ${this.#minBet}.`);
+
+      player.chips -= amount;
+      this.#pot += amount;
     }
   }
 
@@ -165,12 +145,25 @@ class PokerGame {
     player.cards = [];
   }
 
-  // TODO: Add support for other poker variants
-
   start() {
+    this.#collectBlinds();
+    this.#minBet = this.blinds.bigBlind;
     this.#deck.shuffle();
     this.#deal();
-    // TODO: Collect blinds to pot
+  }
+
+  #deal() {
+    this.#players.forEach((player) => {
+      player.cards = this.#deck.drawMany(this.#handSize);
+    });
+  }
+
+  #collectBlinds() {
+    this.bet(this.bigBlindPlayer, this.blinds.bigBlind);
+    this.bet(this.smallBlindPlayer, this.blinds.smallBlind);
+    this.#players.slice(2).forEach((player) => {
+      this.bet(player, this.blinds.ante);
+    });
   }
 
   // TODO: Add support for fewer than 3 players
@@ -180,7 +173,9 @@ class PokerGame {
   #rotatePlayers() {
     // Rotate players array clockwise
     const lastPlayer = this.#players.pop();
-    this.#players.unshift(lastPlayer!);
+    if (lastPlayer) {
+      this.#players.unshift(lastPlayer);
+    }
   }
 
   #dealFlop() {
@@ -194,13 +189,12 @@ class PokerGame {
 }
 
 interface PokerGameParameters {
-  players: PokerPlayer<FrenchCard>[];
-  maxPlayers?: number;
+  blinds?: Blinds;
+  cardRanks?: Value[];
   deck?: PokerDeck;
   handSize?: number;
-  cardRanks?: Value[];
-  blinds?: Blinds;
-  betLimit?: number;
+  maxPlayers?: number;
+  players: PokerPlayer<FrenchCard>[];
 }
 
 export const defaultCardRanks = [
