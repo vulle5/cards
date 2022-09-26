@@ -17,6 +17,5 @@ const pokerGame = new PokerGame({
 pokerGame.start();
 pokerGame.bet(pokerGame.players[0], 100);
 pokerGame.bet(pokerGame.players[1], 400);
-pokerGame.fold(pokerGame.players[2]);
 pokerGame.bet(pokerGame.players[2], 750);
 console.log(pokerGame.pot);

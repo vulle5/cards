@@ -62,10 +62,10 @@ class PokerGame {
     return this.#players.at(-1) as PokerPlayer<FrenchCard>;
   }
   get smallBlindPlayer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(0) as PokerPlayer<FrenchCard>;
+    return this.#players.at(1) as PokerPlayer<FrenchCard>;
   }
   get bigBlindPlayer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(1) as PokerPlayer<FrenchCard>;
+    return this.#players.at(0) as PokerPlayer<FrenchCard>;
   }
 
   get betLimit() {
@@ -138,7 +138,7 @@ class PokerGame {
    * @throws Error if the player has already folded.
   */
   bet(player: PokerPlayer<FrenchCard>, amount: number) {
-    assert(this.playerActive(player), "Player is not active.");
+    assert(this.playerActive(player), "Player is not active (folded or no chips).");
 
     const playerGoesAllIn = amount >= player.chips;
     if (playerGoesAllIn) {
@@ -159,7 +159,7 @@ class PokerGame {
    * @throws Error if the player has already folded.
   */
   fold(player: PokerPlayer<FrenchCard>) {
-    assert(this.playerActive(player), "Player is not active.");
+    assert(this.playerActive(player), "Player is not active (folded or no chips).");
 
     player.folded = true;
     player.cards = [];
@@ -168,26 +168,19 @@ class PokerGame {
   // TODO: Add support for other poker variants
 
   start() {
-    // TODO: Rotate blinds and dealer
     this.#deck.shuffle();
     this.#deal();
     // TODO: Collect blinds to pot
   }
 
-  rotatePlayers() {
-    this.#rotateBlinds();
-    this.#rotateDealer();
-  }
-
   // TODO: Add support for fewer than 3 players
-  #rotateDealer() {
-    this.#players.unshift(this.#players.pop()!);
-    return this.dealer;
-  }
-
-  // TODO: Add support for fewer than 3 players
-  #rotateBlinds() {
-    this.#players.push(this.#players.shift()!);
+  /** 
+   * Rotate the blinds and the dealer.
+  */
+  #rotatePlayers() {
+    // Rotate players array clockwise
+    const lastPlayer = this.#players.pop();
+    this.#players.unshift(lastPlayer!);
   }
 
   #dealFlop() {
