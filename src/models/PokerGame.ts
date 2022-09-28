@@ -43,6 +43,9 @@ class PokerGame {
   get board() {
     return this.#board;
   }
+  get deck() {
+    return this.#deck;
+  }
   get handSize() {
     return this.#handSize;
   }
@@ -52,14 +55,17 @@ class PokerGame {
   get players() {
     return this.#players;
   }
+  // TODO: Add support for fewer than 3 players
   get dealer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(-1) as PokerPlayer<FrenchCard>;
+    return this.#players.at(0) as PokerPlayer<FrenchCard>;
   }
+  // TODO: Add support for fewer than 3 players
   get smallBlindPlayer(): PokerPlayer<FrenchCard> {
     return this.#players.at(1) as PokerPlayer<FrenchCard>;
   }
+  // TODO: Add support for fewer than 3 players
   get bigBlindPlayer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(0) as PokerPlayer<FrenchCard>;
+    return this.#players.at(2) as PokerPlayer<FrenchCard>;
   }
 
   // TODO: Add unique ID to players
@@ -161,7 +167,7 @@ class PokerGame {
   #collectBlinds() {
     this.bet(this.bigBlindPlayer, this.blinds.bigBlind);
     this.bet(this.smallBlindPlayer, this.blinds.smallBlind);
-    this.#players.slice(2).forEach((player) => {
+    [this.dealer, ...this.#players.slice(3)].forEach((player) => {
       this.bet(player, this.blinds.ante);
     });
   }
@@ -188,7 +194,7 @@ class PokerGame {
   }
 }
 
-interface PokerGameParameters {
+export interface PokerGameParameters {
   blinds?: Blinds;
   cardRanks?: Value[];
   deck?: PokerDeck;
