@@ -1,4 +1,4 @@
-import { assert } from "../deps.ts";
+import { assert } from 'testing/asserts.ts';
 import Blinds from "./Blinds.ts";
 import FrenchCard, { Value } from "./FrenchCard.ts";
 import PokerPlayer from "./PokerPlayer.ts";

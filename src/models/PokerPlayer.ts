@@ -1,4 +1,4 @@
-import { assert } from "../deps.ts";
+import { assert } from 'testing/asserts.ts';
 
 class PokerPlayer<T> {
   name: string;
