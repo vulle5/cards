@@ -1,4 +1,4 @@
-import { assertEquals, assertStrictEquals } from "testing/asserts.ts";
+import { assert, assertEquals, assertStrictEquals } from "testing/asserts.ts";
 import Blinds from "../Blinds.ts";
 import FrenchCard from "../FrenchCard.ts";
 import PokerGame, { PokerGameParameters } from "../PokerGame.ts";
@@ -49,9 +49,13 @@ Deno.test("start() handles pre-game actions", () => {
   assertStrictEquals(game.dealer.chips, 990);
   assertStrictEquals(game.smallBlindPlayer.chips, 975);
   assertStrictEquals(game.bigBlindPlayer.chips, 950);
+  assertStrictEquals(game.players[3].chips, 990);
 
   // Cards are dealt
   game.players.forEach((player) => {
     assertStrictEquals(player.cards.length, 2);
   });
+
+  // Player in action is the fourth player (player left of big blind)
+  assert(game.players[3].inAction);
 });

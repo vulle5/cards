@@ -14,7 +14,7 @@ const pokerGame = new PokerGame({
 });
 
 pokerGame.start();
-pokerGame.bet(pokerGame.players[0], 100);
-pokerGame.bet(pokerGame.players[1], 400);
-pokerGame.bet(pokerGame.players[2], 750);
+pokerGame.players[0].bet(100);
+pokerGame.players[1].bet(400);
+pokerGame.players[2].bet(750);
 console.log(pokerGame.pot);
