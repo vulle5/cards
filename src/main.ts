@@ -13,11 +13,6 @@ const pokerGame = new PokerGame({
   handSize: 2
 });
 
-// TODO:
-// - Player order is incorrect. Player left of small blind should be first to act.
-// - Handle rounds of betting
-// - PokerPlayer tests
-
 pokerGame.start();
 pokerGame.act({ type: ActionType.Bet, amount: 100 });
 pokerGame.act({ type: ActionType.Bet, amount: 400 });
