@@ -1,7 +1,7 @@
 import Blinds from "./models/Blinds.ts";
 import FrenchCard from "./models/FrenchCard.ts";
 import PokerPlayer from "./models/PokerPlayer.ts";
-import PokerGame from "./models/PokerGame.ts";
+import PokerGame, { ActionType } from "./models/PokerGame.ts";
 
 const pokerGame = new PokerGame({
   players: [
@@ -13,8 +13,13 @@ const pokerGame = new PokerGame({
   handSize: 2
 });
 
+// TODO:
+// - Player order is incorrect. Player left of small blind should be first to act.
+// - Handle rounds of betting
+// - PokerPlayer tests
+
 pokerGame.start();
-pokerGame.players[0].bet(100);
-pokerGame.players[1].bet(400);
-pokerGame.players[2].bet(750);
+pokerGame.act({ type: ActionType.Bet, amount: 100 });
+pokerGame.act({ type: ActionType.Bet, amount: 400 });
+pokerGame.act({ type: ActionType.Bet, amount: 750 });
 console.log(pokerGame.pot);

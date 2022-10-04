@@ -80,7 +80,10 @@ class PokerPlayer<T> {
       this.game.pot += this.chips;
       this.chips -= this.chips;
     } else {
-      assert(this.game.overOrEqualMinBet(amount), `Bet is too small. Min bet is ${this.game.minBet}.`);
+      assert(
+        amount >= this.game.minBet || this.game.minBet === 0,
+        `Bet is too small. Min bet is ${this.game.minBet}.`
+      );
 
       this.chips -= amount;
       this.game.pot += amount;
@@ -103,7 +106,6 @@ class PokerPlayer<T> {
    * Make player check.
    * @throws Error if the player is not in the game.
    * @throws Error if the player has already folded.
-   * @throws Error if it's not players turn.
   */
   check() {
     assert(this.playerActive(), "Player is not active (folded or no chips).");

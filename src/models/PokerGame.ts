@@ -3,6 +3,7 @@ import Blinds from "./Blinds.ts";
 import FrenchCard, { Value } from "./FrenchCard.ts";
 import PokerPlayer from "./PokerPlayer.ts";
 import PokerDeck from "./PokerDeck.ts";
+import * as PokerGameErrors from "./PokerGameErrors.ts";
 
 class PokerGame {
   blinds: Blinds;
@@ -86,15 +87,6 @@ class PokerGame {
   }
 
   /**
-   * Amount is over or equal the minimum bet or minimum bet is zero.
-   * @param amount The amount to bet.
-   * @returns true if the amount is over or equal to the minimum bet or minimum bet is zero.
-   */
-  overOrEqualMinBet(amount: number): boolean {
-    return amount >= this.minBet || this.minBet === 0;
-  }
-
-  /**
    * Adds a player to the game.
    * @param player The player to add.
    * @throws Error if the game is full.
@@ -107,15 +99,42 @@ class PokerGame {
     this.#players.push(player);
   }
 
+  playerInAction(): PokerPlayer<FrenchCard> | undefined {
+    return this.players.find((player) => player.inAction);
+  }
+
   // TODO: Add support for fewer than 3 players
   start() {
     this.#collectBlinds();
     this.#minBet = this.blinds.bigBlind;
     this.deck.shuffle();
     this.#deal();
-    const playerInAction = this.players.at(3) ?? this.players.at(0);
-    if (playerInAction) {
-      playerInAction.inAction = true;
+    this.#setFirstPlayerInAction();
+  }
+
+  act(action: Action) {
+    const player = this.playerInAction();
+
+    if (player) {
+      assert(player.playerActive(), "Player is not active.");
+
+      switch (action.type) {
+        case "raise":
+        case "call":
+        case "bet":
+          player.bet(action.amount ?? 0);
+          break;
+        case "check":
+          player.check();
+          break;
+        case "fold":
+          player.fold();
+          break;
+      }
+      
+      this.#setNextPlayerInAction();
+    } else {
+      throw new PokerGameErrors.GameStateError("No player in action.");
     }
   }
 
@@ -131,6 +150,27 @@ class PokerGame {
     [this.dealer, ...this.players.slice(3)].forEach((player) => {
       player.bet(this.blinds.ante);
     });
+  }
+
+  #setFirstPlayerInAction() {
+    const playerInAction = this.players.at(3) ?? this.players.at(0);
+    if (playerInAction) {
+      playerInAction.inAction = true;
+    }
+  }
+
+  #setNextPlayerInAction() {
+    const playerInAction = this.playerInAction();
+    if (playerInAction) {
+      playerInAction.inAction = false;
+    }
+
+    const nextPlayerInAction = this.players.at(
+      this.players.indexOf(playerInAction!) + 1
+    ) ?? this.players.at(0);
+    if (nextPlayerInAction) {
+      nextPlayerInAction.inAction = true;
+    }
   }
 
   // TODO: Add support for fewer than 3 players
@@ -159,6 +199,19 @@ export interface PokerGameParameters {
   handSize?: number;
   maxPlayers?: number;
   players: PokerPlayer<FrenchCard>[];
+}
+
+export enum ActionType {
+  Bet = "bet",
+  Call = "call",
+  Check = "check",
+  Fold = "fold",
+  Raise = "raise"
+}
+
+export interface Action {
+  type: ActionType;
+  amount?: number;
 }
 
 export const defaultCardRanks = [

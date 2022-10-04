@@ -1,7 +1,7 @@
-import { assert, assertEquals, assertStrictEquals } from "testing/asserts.ts";
+import { assertEquals, assertStrictEquals } from "testing/asserts.ts";
 import Blinds from "../Blinds.ts";
 import FrenchCard from "../FrenchCard.ts";
-import PokerGame, { PokerGameParameters } from "../PokerGame.ts";
+import PokerGame, { ActionType, PokerGameParameters } from "../PokerGame.ts";
 import PokerPlayer from "../PokerPlayer.ts";
 
 /**
@@ -57,5 +57,34 @@ Deno.test("start() handles pre-game actions", () => {
   });
 
   // Player in action is the fourth player (player left of big blind)
-  assert(game.players[3].inAction);
+  assertStrictEquals(game.players[3].inAction, true);
+});
+
+Deno.test("act() handles bet action", () => {
+  const game: PokerGame = createPokerGame();
+  game.start();
+
+  game.act({ type: ActionType.Bet, amount: 100 }); // Player 4
+  game.act({ type: ActionType.Bet, amount: 200 }); // Player 1
+  game.act({ type: ActionType.Bet, amount: 300 }); // Player 2
+  game.act({ type: ActionType.Bet, amount: 1100 }); // Player 3
+
+  assertStrictEquals(game.players[0].chips, 800);
+  assertStrictEquals(game.players[1].chips, 700);
+  assertStrictEquals(game.players[2].chips, 0);
+  assertStrictEquals(game.players[3].chips, 900);
+});
+
+Deno.test("act() handles player switching", () => {
+  const game: PokerGame = createPokerGame();
+  game.start();
+
+  assertStrictEquals(game.players[3].inAction, true);
+  game.act({ type: ActionType.Bet, amount: 100 });
+  assertStrictEquals(game.players[3].inAction, false);
+
+  assertStrictEquals(game.players[0].inAction, true);
+  game.act({ type: ActionType.Bet, amount: 100 });
+  assertStrictEquals(game.players[0].inAction, false);
+  assertStrictEquals(game.players[1].inAction, true);
 });
