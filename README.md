@@ -9,4 +9,5 @@ Testing TypeScript and Deno with this project
   - Put in all of their chips
   - Matched the amount put in by all other active players.
 - PokerPlayer tests
+- Change assertions in class to actual errors or remove error if it's not needed
 - and a lot more 😁
