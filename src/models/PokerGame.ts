@@ -157,9 +157,12 @@ class PokerGame {
   }
 
   #setFirstPlayerInAction() {
-    const playerInAction = this.players.at(3) ?? this.players.at(0);
+    const playerInAction = this.players.at(0);
+
     if (playerInAction) {
       playerInAction.inAction = true;
+    } else {
+      throw new PokerGameErrors.GameStateError("No players in game.");
     }
   }
 
