@@ -31,8 +31,7 @@ class PokerGame {
     this.#registerPlayers();
 
     assert(this.#maxPlayers > 1, "Max players must be greater than 1.");
-    // TODO: Add support for fewer than 3 players
-    assert(this.#players.length > 2, "Must have at least 3 players.");
+    assert(this.#players.length >= 2, "Must have at least 2 players.");
     assert(
       this.#players.length <= this.#maxPlayers,
       `Too many players. Max is ${this.#maxPlayers}.`
@@ -60,17 +59,22 @@ class PokerGame {
   get maxPlayers() {
     return this.#maxPlayers;
   }
-  // TODO: Add support for fewer than 3 players
   get dealer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(0) as PokerPlayer<FrenchCard>;
+    return this.#players.at(-1)!;
   }
-  // TODO: Add support for fewer than 3 players
   get smallBlindPlayer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(1) as PokerPlayer<FrenchCard>;
+    if (this.players.length >= 3) {
+      return this.#players.at(-2)!;
+    } else {
+      return this.dealer;
+    }
   }
-  // TODO: Add support for fewer than 3 players
   get bigBlindPlayer(): PokerPlayer<FrenchCard> {
-    return this.#players.at(2) as PokerPlayer<FrenchCard>;
+    if (this.players.length >= 3) {
+      return this.#players.at(-3)!;
+    } else {
+      return this.#players.at(0)!;
+    }
   }
 
   get pot() {
@@ -103,9 +107,8 @@ class PokerGame {
     return this.players.find((player) => player.inAction);
   }
 
-  // TODO: Add support for fewer than 3 players
   start() {
-    this.#collectBlinds();
+    this.#collectForcedBets();
     this.#minBet = this.blinds.bigBlind;
     this.deck.shuffle();
     this.#deal();
@@ -144,10 +147,11 @@ class PokerGame {
     });
   }
 
-  #collectBlinds() {
+  #collectForcedBets() {
     this.bigBlindPlayer.bet(this.blinds.bigBlind);
     this.smallBlindPlayer.bet(this.blinds.smallBlind);
-    [this.dealer, ...this.players.slice(3)].forEach((player) => {
+    // Take ante from all of the players
+    this.players.forEach((player) => {
       player.bet(this.blinds.ante);
     });
   }
@@ -173,17 +177,11 @@ class PokerGame {
     }
   }
 
-  // TODO: Add support for fewer than 3 players
+  // TODO: Implement method
   /** 
    * Rotate the blinds and the dealer.
   */
-  #rotatePlayers() {
-    // Rotate players array clockwise
-    const lastPlayer = this.players.pop();
-    if (lastPlayer) {
-      this.players.unshift(lastPlayer);
-    }
-  }
+  #rotatePlayers() {}
 
   #registerPlayers() {
     this.players.forEach((player) => {
