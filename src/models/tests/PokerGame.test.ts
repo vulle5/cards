@@ -70,26 +70,45 @@ Deno.test('PokerGame - constructor', async (t) => {
   })
 });
 
-Deno.test("In game with more than 3 players", async (t) => {
-  const pokerGame: PokerGame = createPokerGame({
-    players: [
-      new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
-      new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
-      new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
-    ]
-  });
-  assertStrictEquals(pokerGame.players.length, 3);
+Deno.test("In game with more than 2 players", async (t) => {
+  await t.step('with 3 players', async (t) => {
+    const pokerGame: PokerGame = createPokerGame({
+      players: [
+        new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
+        new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
+        new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
+      ]
+    });
+    assertStrictEquals(pokerGame.players.length, 3);
 
-  await t.step('dealer is last in the players array', () => {
-    assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[2], pokerGame.dealer);
+    await t.step('dealer is last in the players array', () => {
+      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[2], pokerGame.dealer);
+    })
+  
+    await t.step('small blind player is second last', () => {
+      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[1], pokerGame.smallBlindPlayer);
+    })
+  
+    await t.step('big blind player is third last', () => {
+      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[0], pokerGame.bigBlindPlayer);
+    })
   })
 
-  await t.step('small blind player is second last', () => {
-    assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[1], pokerGame.smallBlindPlayer);
-  })
+  await t.step('with 4 or more players', async (t) => {
+    const pokerGame: PokerGame = createPokerGame();
+    assertStrictEquals(pokerGame.players.length, 4);
 
-  await t.step('big blind player is third last', () => {
-    assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[0], pokerGame.bigBlindPlayer);
+    await t.step('dealer is last in the players array', () => {
+      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[3], pokerGame.dealer);
+    })
+  
+    await t.step('small blind player is second last', () => {
+      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[2], pokerGame.smallBlindPlayer);
+    })
+  
+    await t.step('big blind player is third last', () => {
+      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[1], pokerGame.bigBlindPlayer);
+    })
   })
 });
 
@@ -136,35 +155,35 @@ Deno.test("start() handles pre-game actions", () => {
     assertStrictEquals(player.cards.length, 2);
   });
 
-  // Player in action is the fourth player (player left of big blind)
-  assertStrictEquals(pokerGame.players[3].inAction, true);
+  // Player in action is the first player
+  assertStrictEquals(pokerGame.players[0].inAction, true);
 });
 
 Deno.test("act() handles bet action", () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
-  pokerGame.act({ type: ActionType.Bet, amount: 100 }); // Player 4
-  pokerGame.act({ type: ActionType.Bet, amount: 200 }); // Player 1
-  pokerGame.act({ type: ActionType.Bet, amount: 300 }); // Player 2
-  pokerGame.act({ type: ActionType.Bet, amount: 1100 }); // Player 3
+  pokerGame.act({ type: ActionType.Bet, amount: 100 }); // Player 1
+  pokerGame.act({ type: ActionType.Bet, amount: 200 }); // Player 2
+  pokerGame.act({ type: ActionType.Bet, amount: 300 }); // Player 3
+  pokerGame.act({ type: ActionType.Bet, amount: 1100 }); // Player 4
 
-  assertStrictEquals(pokerGame.players[0].chips, 800);
-  assertStrictEquals(pokerGame.players[1].chips, 700);
-  assertStrictEquals(pokerGame.players[2].chips, 0);
-  assertStrictEquals(pokerGame.players[3].chips, 900);
+  assertStrictEquals(pokerGame.players[0].chips, 900);
+  assertStrictEquals(pokerGame.players[1].chips, 800);
+  assertStrictEquals(pokerGame.players[2].chips, 700);
+  assertStrictEquals(pokerGame.players[3].chips, 0);
 });
 
 Deno.test("act() handles player switching", () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
-  assertStrictEquals(pokerGame.players[3].inAction, true);
-  pokerGame.act({ type: ActionType.Bet, amount: 100 });
-  assertStrictEquals(pokerGame.players[3].inAction, false);
-
   assertStrictEquals(pokerGame.players[0].inAction, true);
   pokerGame.act({ type: ActionType.Bet, amount: 100 });
   assertStrictEquals(pokerGame.players[0].inAction, false);
+
   assertStrictEquals(pokerGame.players[1].inAction, true);
+  pokerGame.act({ type: ActionType.Bet, amount: 100 });
+  assertStrictEquals(pokerGame.players[1].inAction, false);
+  assertStrictEquals(pokerGame.players[2].inAction, true);
 });
