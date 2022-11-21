@@ -35,7 +35,7 @@ class PokerPlayer<T> {
 
   /**
    * Checks if the player has chips and has not folded.
-   * @returns true if the player has chips and folded is falsy.
+   * @returns true if the player has chips and has not folded.
   */
   canPlay() {
     return !this.folded && this.#chips > 0;
@@ -45,7 +45,7 @@ class PokerPlayer<T> {
    * Checks if a player is in the game.
    * @returns true if the player is in the game.
   */
-  playerInGame(): boolean {
+  inGame(): boolean {
     if (!this.game) {
       return false;
     }
@@ -54,11 +54,11 @@ class PokerPlayer<T> {
   }
 
   /**
-   * Checks if player is active (not folded and has chips).
+   * Checks if player is not folded and is in game.
    * @returns true if the player is active.
   */
-  playerActive(): boolean {
-    return this.canPlay() && this.playerInGame();
+  isActive(): boolean {
+    return !this.folded && this.inGame();
   }
 
   /**
@@ -70,7 +70,7 @@ class PokerPlayer<T> {
    * @throws Error if the player has already folded.
   */
   bet(amount: number) {
-    assert(this.playerActive(), "Player is not active (folded or no chips).");
+    assert(this.isActive(), "Player is not active (folded or no chips).");
     if (!this.game) {
       throw new Error("Player is not in a game.");
     }
@@ -96,7 +96,7 @@ class PokerPlayer<T> {
    * @throws Error if the player has already folded.
   */
   fold() {
-    assert(this.playerActive(), "Player is not active (folded or no chips).");
+    assert(this.isActive(), "Player is not active (folded or no chips).");
 
     this.folded = true;
     this.cards = [];
@@ -108,7 +108,7 @@ class PokerPlayer<T> {
    * @throws Error if the player has already folded.
   */
   check() {
-    assert(this.playerActive(), "Player is not active (folded or no chips).");
+    assert(this.isActive(), "Player is not active (folded or no chips).");
     assert(this.game!.minBet > 0, "Minimum bet is not zero.");
   }
 }

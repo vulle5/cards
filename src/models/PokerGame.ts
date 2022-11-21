@@ -98,7 +98,7 @@ class PokerGame {
   */
   addPlayer(player: PokerPlayer<FrenchCard>) {
     assert(this.gameFull(), "Game is full.");
-    assert(player.playerInGame(), "Player is already in the game.");
+    assert(player.inGame(), "Player is already in the game.");
 
     this.#players.push(player);
   }
@@ -119,7 +119,7 @@ class PokerGame {
     const player = this.playerInAction();
 
     if (player) {
-      assert(player.playerActive(), "Player is not active.");
+      assert(player.isActive(), "Player is not active.");
 
       switch (action.type) {
         case "raise":
@@ -172,12 +172,22 @@ class PokerGame {
       playerInAction.inAction = false;
     }
 
+    if (this.#roundOver()) return;
+
     const nextPlayerInAction = this.players.at(
       this.players.indexOf(playerInAction!) + 1
     ) ?? this.players.at(0);
     if (nextPlayerInAction) {
       nextPlayerInAction.inAction = true;
     }
+  }
+
+  #roundOver(): boolean {
+    if (this.players.length === 1 || this.players.every((player) => player.folded)) {
+      return true;
+    }
+
+    return false;
   }
 
   // TODO: Implement method
