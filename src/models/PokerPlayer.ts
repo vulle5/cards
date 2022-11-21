@@ -7,8 +7,8 @@ class PokerPlayer<T> {
   cards: T[];
   #chips = 0;
   folded = false;
-  inAction = false;
   #game?: PokerGame;
+  currentBet = 0; // Bets made in the current betting round
 
   constructor(name: string, { cards = [], chips = 0 }: PlayerParameters<T> = {}) {
     this.name = name;
@@ -88,6 +88,7 @@ class PokerPlayer<T> {
       this.chips -= amount;
       this.game.pot += amount;
     }
+    this.currentBet += amount;
   }
 
   /**

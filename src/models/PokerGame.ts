@@ -14,6 +14,7 @@ class PokerGame {
   #maxPlayers;
   #minBet = 0;
   #players: PokerPlayer<FrenchCard>[];
+  #playerInAction: PokerPlayer<FrenchCard>;
   #pot = 0;
 
   constructor({
@@ -28,6 +29,7 @@ class PokerGame {
     this.#deck = deck;
     this.#maxPlayers = maxPlayers;
     this.#players = players;
+    this.#playerInAction = this.players.at(0)!;
     this.#registerPlayers();
 
     assert(this.#maxPlayers > 1, "Max players must be greater than 1.");
@@ -58,6 +60,9 @@ class PokerGame {
   }
   get maxPlayers() {
     return this.#maxPlayers;
+  }
+  get playerInAction(): PokerPlayer<FrenchCard>{
+    return this.#playerInAction;
   }
   get dealer(): PokerPlayer<FrenchCard> {
     return this.#players.at(-1)!;
@@ -103,20 +108,15 @@ class PokerGame {
     this.#players.push(player);
   }
 
-  playerInAction(): PokerPlayer<FrenchCard> | undefined {
-    return this.players.find((player) => player.inAction);
-  }
-
   start() {
     this.#collectForcedBets();
     this.#minBet = this.blinds.bigBlind;
     this.deck.shuffle();
     this.#deal();
-    this.#setFirstPlayerInAction();
   }
 
   act(action: Action) {
-    const player = this.playerInAction();
+    const player = this.playerInAction;
 
     if (player) {
       assert(player.isActive(), "Player is not active.");
@@ -156,29 +156,14 @@ class PokerGame {
     });
   }
 
-  #setFirstPlayerInAction() {
-    const playerInAction = this.players.at(0);
-
-    if (playerInAction) {
-      playerInAction.inAction = true;
-    } else {
-      throw new PokerGameErrors.GameStateError("No players in game.");
-    }
-  }
-
   #setNextPlayerInAction() {
-    const playerInAction = this.playerInAction();
-    if (playerInAction) {
-      playerInAction.inAction = false;
-    }
-
     if (this.#roundOver()) return;
 
     const nextPlayerInAction = this.players.at(
-      this.players.indexOf(playerInAction!) + 1
+      this.players.indexOf(this.playerInAction) + 1
     ) ?? this.players.at(0);
     if (nextPlayerInAction) {
-      nextPlayerInAction.inAction = true;
+      this.#playerInAction = nextPlayerInAction;
     }
   }
 

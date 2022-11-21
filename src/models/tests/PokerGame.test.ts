@@ -156,7 +156,7 @@ Deno.test("start() handles pre-game actions", () => {
   });
 
   // Player in action is the first player
-  assertStrictEquals(pokerGame.players[0].inAction, true);
+  assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
 });
 
 Deno.test("act() handles bet action", () => {
@@ -178,12 +178,9 @@ Deno.test("act() handles player switching", () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
-  assertStrictEquals(pokerGame.players[0].inAction, true);
+  assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
   pokerGame.act({ type: ActionType.Bet, amount: 100 });
-  assertStrictEquals(pokerGame.players[0].inAction, false);
-
-  assertStrictEquals(pokerGame.players[1].inAction, true);
+  assertEquals(pokerGame.playerInAction, pokerGame.players[1]);
   pokerGame.act({ type: ActionType.Bet, amount: 100 });
-  assertStrictEquals(pokerGame.players[1].inAction, false);
-  assertStrictEquals(pokerGame.players[2].inAction, true);
+  assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
 });
