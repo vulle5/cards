@@ -55,9 +55,6 @@ class PokerGame {
   get players() {
     return this.#players;
   }
-  get minBet() {
-    return this.#minBet;
-  }
   get maxPlayers() {
     return this.#maxPlayers;
   }
@@ -82,6 +79,12 @@ class PokerGame {
     }
   }
 
+  get minBet() {
+    return this.#minBet;
+  }
+  set minBet(amount: number) {
+    this.#minBet = amount;
+  }
   get pot() {
     return this.#pot;
   }
@@ -110,7 +113,6 @@ class PokerGame {
 
   start() {
     this.#collectForcedBets();
-    this.#minBet = this.blinds.bigBlind;
     this.deck.shuffle();
     this.#deal();
   }
@@ -148,12 +150,14 @@ class PokerGame {
   }
 
   #collectForcedBets() {
-    this.bigBlindPlayer.bet(this.blinds.bigBlind);
-    this.smallBlindPlayer.bet(this.blinds.smallBlind);
+    this.bigBlindPlayer.collectChips(this.blinds.bigBlind);
+    this.smallBlindPlayer.collectChips(this.blinds.smallBlind);
     // Take ante from all of the players
     this.players.forEach((player) => {
-      player.bet(this.blinds.ante);
+      player.collectChips(this.blinds.ante);
     });
+    // Set the minimum bet to the big blind
+    this.#minBet = this.blinds.bigBlind;
   }
 
   #setNextPlayerInAction() {

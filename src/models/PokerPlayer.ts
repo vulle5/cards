@@ -62,6 +62,25 @@ class PokerPlayer<T> {
   }
 
   /**
+   * Collect chips from the player and add them to the pot.
+   * @param amount The amount of chips to collect.
+   * @throws Error if the player is not in the game.
+  */
+  collectChips(amount: number) {
+    if (!this.game) {
+      throw new Error("Player is not in a game.");
+    }
+
+    if (amount >= this.chips) {
+      this.game.pot += this.chips;
+      this.chips -= this.chips;
+    } else {
+      this.chips -= amount;
+      this.game.pot += amount;
+    }
+  }
+
+  /**
    * Bet an amount of chips. Bets player's entire chip stack if they don't have enough chips.
    * @param amount The amount of chips to bet.
    * @throws Error if amount is less than zero.
@@ -77,16 +96,15 @@ class PokerPlayer<T> {
 
     // If player goes all in, bet all chips
     if (amount >= this.chips) {
-      this.game.pot += this.chips;
-      this.chips -= this.chips;
+      this.collectChips(this.chips);
     } else {
       assert(
-        amount >= this.game.minBet || this.game.minBet === 0,
+        amount >= this.game.minBet,
         `Bet is too small. Min bet is ${this.game.minBet}.`
       );
 
-      this.chips -= amount;
-      this.game.pot += amount;
+      this.collectChips(amount);
+      this.game.minBet = amount;
     }
     this.currentBet += amount;
   }

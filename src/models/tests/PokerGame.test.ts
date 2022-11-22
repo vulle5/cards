@@ -184,3 +184,40 @@ Deno.test("act() handles player switching", () => {
   pokerGame.act({ type: ActionType.Bet, amount: 100 });
   assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
 });
+
+Deno.test('Min bets handled', async (t) => {
+  await t.step('if game has blinds', () => {
+    const pokerGame: PokerGame = createPokerGame({
+      blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
+    });
+    pokerGame.start();
+    assertStrictEquals(pokerGame.minBet, 50);
+    pokerGame.act({ type: ActionType.Bet, amount: 100 });
+    assertStrictEquals(pokerGame.minBet, 100);
+  });
+
+  await t.step('if game has no blinds', () => {
+    const pokerGame: PokerGame = createPokerGame({
+      blinds: undefined,
+    });
+    pokerGame.start();
+    assertStrictEquals(pokerGame.minBet, 0);
+    pokerGame.act({ type: ActionType.Bet, amount: 100 });
+    assertStrictEquals(pokerGame.minBet, 100);
+  });
+
+  await t.step('if bet is lower than current min bet', () => {
+    const pokerGame: PokerGame = createPokerGame({
+      blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
+    });
+    pokerGame.start();
+    assertStrictEquals(pokerGame.minBet, 50);
+    assertThrows(
+      () => {
+        pokerGame.act({ type: ActionType.Bet, amount: 25 });
+      },
+      AssertionError,
+      'Bet is too small. Min bet is 50.'
+    );
+  });
+})

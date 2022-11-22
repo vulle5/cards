@@ -1,25 +1,3 @@
-export enum Suit {
-  Diamond,
-  Heart,
-  Club,
-  Spade,
-}
-export enum Value {
-  Two = "2",
-  Three = "3",
-  Four = "4",
-  Five = "5",
-  Six = "6",
-  Seven = "7",
-  Eight = "8",
-  Nine = "9",
-  Ten = "10",
-  Jack = "J",
-  Queen = "Q",
-  King = "K",
-  Ace = "A",
-}
-
 class FrenchCard {
   readonly value: Value;
   readonly suit: Suit;
@@ -45,6 +23,28 @@ class FrenchCard {
   toString(): string {
     return `${this.value} of ${Suit[this.suit]}s`;
   }
+}
+
+export enum Suit {
+  Diamond,
+  Heart,
+  Club,
+  Spade,
+}
+export enum Value {
+  Two = "2",
+  Three = "3",
+  Four = "4",
+  Five = "5",
+  Six = "6",
+  Seven = "7",
+  Eight = "8",
+  Nine = "9",
+  Ten = "10",
+  Jack = "J",
+  Queen = "Q",
+  King = "K",
+  Ace = "A",
 }
 
 export default FrenchCard;
