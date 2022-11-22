@@ -1,7 +1,7 @@
-import Blinds from "./models/Blinds.ts";
-import FrenchCard from "./models/FrenchCard.ts";
-import PokerPlayer from "./models/PokerPlayer.ts";
-import PokerGame, { ActionType } from "./models/PokerGame.ts";
+import Blinds from './models/Blinds.ts';
+import FrenchCard from './models/FrenchCard.ts';
+import PokerPlayer from './models/PokerPlayer.ts';
+import PokerGame, { ActionType } from './models/PokerGame.ts';
 
 const pokerGame = new PokerGame({
   players: [
@@ -10,7 +10,7 @@ const pokerGame = new PokerGame({
     new PokerPlayer<FrenchCard>('Player 3', { chips: 750 }),
   ],
   blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
-  handSize: 2
+  handSize: 2,
 });
 
 pokerGame.start();

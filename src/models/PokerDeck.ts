@@ -1,5 +1,5 @@
-import FrenchCard, { Value, Suit } from "./FrenchCard.ts";
-import CardDeck from "./CardDeck.ts";
+import FrenchCard, { Suit, Value } from './FrenchCard.ts';
+import CardDeck from './CardDeck.ts';
 
 class PokerDeck extends CardDeck<FrenchCard> {
   constructor() {

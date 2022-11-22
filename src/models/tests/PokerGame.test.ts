@@ -1,8 +1,13 @@
-import { assertEquals, AssertionError, assertStrictEquals, assertThrows } from "testing/asserts.ts";
-import Blinds from "../Blinds.ts";
-import FrenchCard from "../FrenchCard.ts";
-import PokerGame, { ActionType, PokerGameParameters } from "../PokerGame.ts";
-import PokerPlayer from "../PokerPlayer.ts";
+import {
+  assertEquals,
+  AssertionError,
+  assertStrictEquals,
+  assertThrows,
+} from 'testing/asserts.ts';
+import Blinds from '../Blinds.ts';
+import FrenchCard from '../FrenchCard.ts';
+import PokerGame, { ActionType, PokerGameParameters } from '../PokerGame.ts';
+import PokerPlayer from '../PokerPlayer.ts';
 
 /**
  * Creates a PokerGame instance with the given parameters.
@@ -18,7 +23,7 @@ const createPokerGame = (params?: Partial<PokerGameParameters>) => (
       new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
       new PokerPlayer<FrenchCard>('Player 4', { chips: 1000 }),
     ],
-    ...params
+    ...params,
   })
 );
 
@@ -44,72 +49,92 @@ Deno.test('PokerGame - constructor', async (t) => {
 
     await t.step('with less than two players', () => {
       assertThrows(() => createPokerGame({ players: [] }));
-      assertThrows(() =>
-        createPokerGame({
-          players: [new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 })],
-        }),
+      assertThrows(
+        () =>
+          createPokerGame({
+            players: [new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 })],
+          }),
         AssertionError,
-        "Must have at least 2 players."
+        'Must have at least 2 players.',
       );
     });
 
-    await t.step("with too many players", () => {
-      assertThrows(() =>
-        createPokerGame({
-          players: [
-            new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 }),
-            new PokerPlayer<FrenchCard>("Player 2", { chips: 1000 }),
-            new PokerPlayer<FrenchCard>("Player 3", { chips: 1000 }),
-          ],
-          maxPlayers: 2,
-        }),
+    await t.step('with too many players', () => {
+      assertThrows(
+        () =>
+          createPokerGame({
+            players: [
+              new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
+              new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
+              new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
+            ],
+            maxPlayers: 2,
+          }),
         AssertionError,
-        "Too many players. Max is 2."
+        'Too many players. Max is 2.',
       );
     });
-  })
+  });
 });
 
-Deno.test("In game with more than 2 players", async (t) => {
+Deno.test('In game with more than 2 players', async (t) => {
   await t.step('with 3 players', async (t) => {
     const pokerGame: PokerGame = createPokerGame({
       players: [
         new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
         new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
         new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
-      ]
+      ],
     });
     assertStrictEquals(pokerGame.players.length, 3);
 
     await t.step('dealer is last in the players array', () => {
-      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[2], pokerGame.dealer);
-    })
-  
+      assertEquals<PokerPlayer<FrenchCard>>(
+        pokerGame.players[2],
+        pokerGame.dealer,
+      );
+    });
+
     await t.step('small blind player is second last', () => {
-      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[1], pokerGame.smallBlindPlayer);
-    })
-  
+      assertEquals<PokerPlayer<FrenchCard>>(
+        pokerGame.players[1],
+        pokerGame.smallBlindPlayer,
+      );
+    });
+
     await t.step('big blind player is third last', () => {
-      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[0], pokerGame.bigBlindPlayer);
-    })
-  })
+      assertEquals<PokerPlayer<FrenchCard>>(
+        pokerGame.players[0],
+        pokerGame.bigBlindPlayer,
+      );
+    });
+  });
 
   await t.step('with 4 or more players', async (t) => {
     const pokerGame: PokerGame = createPokerGame();
     assertStrictEquals(pokerGame.players.length, 4);
 
     await t.step('dealer is last in the players array', () => {
-      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[3], pokerGame.dealer);
-    })
-  
+      assertEquals<PokerPlayer<FrenchCard>>(
+        pokerGame.players[3],
+        pokerGame.dealer,
+      );
+    });
+
     await t.step('small blind player is second last', () => {
-      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[2], pokerGame.smallBlindPlayer);
-    })
-  
+      assertEquals<PokerPlayer<FrenchCard>>(
+        pokerGame.players[2],
+        pokerGame.smallBlindPlayer,
+      );
+    });
+
     await t.step('big blind player is third last', () => {
-      assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[1], pokerGame.bigBlindPlayer);
-    })
-  })
+      assertEquals<PokerPlayer<FrenchCard>>(
+        pokerGame.players[1],
+        pokerGame.bigBlindPlayer,
+      );
+    });
+  });
 });
 
 Deno.test('In game with 2 players', async (t) => {
@@ -117,24 +142,33 @@ Deno.test('In game with 2 players', async (t) => {
     players: [
       new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
       new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
-    ]
+    ],
   });
   assertStrictEquals(pokerGame.players.length, 2);
 
   await t.step('dealer is last in the players array', () => {
-    assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[1], pokerGame.dealer);
-  })
+    assertEquals<PokerPlayer<FrenchCard>>(
+      pokerGame.players[1],
+      pokerGame.dealer,
+    );
+  });
 
   await t.step('small blind player is the dealer', () => {
-    assertEquals<PokerPlayer<FrenchCard>>(pokerGame.dealer, pokerGame.smallBlindPlayer);
-  })
+    assertEquals<PokerPlayer<FrenchCard>>(
+      pokerGame.dealer,
+      pokerGame.smallBlindPlayer,
+    );
+  });
 
   await t.step('big blind is the first player', () => {
-    assertEquals<PokerPlayer<FrenchCard>>(pokerGame.players[0], pokerGame.bigBlindPlayer);
-  })
-})
+    assertEquals<PokerPlayer<FrenchCard>>(
+      pokerGame.players[0],
+      pokerGame.bigBlindPlayer,
+    );
+  });
+});
 
-Deno.test("start() handles pre-game actions", () => {
+Deno.test('start() handles pre-game actions', () => {
   const pokerGame: PokerGame = createPokerGame({
     blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
   });
@@ -159,7 +193,7 @@ Deno.test("start() handles pre-game actions", () => {
   assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
 });
 
-Deno.test("act() handles bet action", () => {
+Deno.test('act() handles bet action', () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
@@ -174,7 +208,7 @@ Deno.test("act() handles bet action", () => {
   assertStrictEquals(pokerGame.players[3].chips, 0);
 });
 
-Deno.test("act() handles player switching", () => {
+Deno.test('act() handles player switching', () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
@@ -217,7 +251,7 @@ Deno.test('Min bets handled', async (t) => {
         pokerGame.act({ type: ActionType.Bet, amount: 25 });
       },
       AssertionError,
-      'Bet is too small. Min bet is 50.'
+      'Bet is too small. Min bet is 50.',
     );
   });
-})
+});

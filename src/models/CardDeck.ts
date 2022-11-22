@@ -1,10 +1,10 @@
 class CardDeck<T> {
-  #cards: T[]
+  #cards: T[];
 
   constructor(cards: T[]) {
-    this.#cards = cards
+    this.#cards = cards;
   }
-  
+
   get cards(): T[] {
     return this.#cards;
   }
@@ -17,9 +17,12 @@ class CardDeck<T> {
    * @returns The card, or undefined if the deck is empty.
    */
   pick(): T | undefined {
-    return this.#cards.splice(Math.floor(Math.random() * this.#cards.length), 1)[0]
+    return this.#cards.splice(
+      Math.floor(Math.random() * this.#cards.length),
+      1,
+    )[0];
   }
-  
+
   /**
    * Draw a card from top of the deck.
    * @returns The card, or undefined if the deck is empty.
@@ -50,8 +53,8 @@ class CardDeck<T> {
    * @returns The deck after addition.
    */
   add(card: T): CardDeck<T> {
-    this.#cards.unshift(card)
-    return this
+    this.#cards.unshift(card);
+    return this;
   }
 
   // Fisher-Yates shuffle
@@ -60,8 +63,8 @@ class CardDeck<T> {
       const j = Math.floor(Math.random() * (i + 1));
       [this.#cards[i], this.#cards[j]] = [this.#cards[j], this.#cards[i]];
     }
-    return this
+    return this;
   }
 }
 
-export default CardDeck
+export default CardDeck;

@@ -1,5 +1,14 @@
 {
   "importMap": "./importMap.json",
+  "fmt": {
+    "files": {
+      "include": ["src/"]
+    },
+    "options": {
+      "singleQuote": true,
+      "proseWrap": "preserve"
+    }
+  },
   "test": {
     "files": {
       "include": ["src/"]

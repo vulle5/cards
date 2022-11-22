@@ -8,13 +8,12 @@ class FrenchCard {
   }
 
   static random(): FrenchCard {
-    const value =
-      Object.values(Value)[
-        Math.floor(Math.random() * Object.values(Value).length)
-      ];
+    const value = Object.values(Value)[
+      Math.floor(Math.random() * Object.values(Value).length)
+    ];
 
     const enumIndexes = Object.values(Suit)
-      .map((n) => Number.parseInt(n as string))
+      .map((n) => Number.parseInt(n as string));
     const suit = enumIndexes[Math.floor(Math.random() * enumIndexes.length)];
 
     return new FrenchCard(value, suit);
@@ -32,19 +31,19 @@ export enum Suit {
   Spade,
 }
 export enum Value {
-  Two = "2",
-  Three = "3",
-  Four = "4",
-  Five = "5",
-  Six = "6",
-  Seven = "7",
-  Eight = "8",
-  Nine = "9",
-  Ten = "10",
-  Jack = "J",
-  Queen = "Q",
-  King = "K",
-  Ace = "A",
+  Two = '2',
+  Three = '3',
+  Four = '4',
+  Five = '5',
+  Six = '6',
+  Seven = '7',
+  Eight = '8',
+  Nine = '9',
+  Ten = '10',
+  Jack = 'J',
+  Queen = 'Q',
+  King = 'K',
+  Ace = 'A',
 }
 
 export default FrenchCard;
