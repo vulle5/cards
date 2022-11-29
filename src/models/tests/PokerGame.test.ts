@@ -6,7 +6,7 @@ import {
 } from 'testing/asserts.ts';
 import Blinds from '../Blinds.ts';
 import FrenchCard from '../FrenchCard.ts';
-import PokerGame, { ActionType, PokerGameParameters } from '../PokerGame.ts';
+import PokerGame, { PokerGameParameters } from '../PokerGame.ts';
 import PokerPlayer from '../PokerPlayer.ts';
 
 /**
@@ -197,10 +197,10 @@ Deno.test('act() handles bet action', () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
-  pokerGame.act({ type: ActionType.Bet, amount: 100 }); // Player 1
-  pokerGame.act({ type: ActionType.Bet, amount: 200 }); // Player 2
-  pokerGame.act({ type: ActionType.Bet, amount: 300 }); // Player 3
-  pokerGame.act({ type: ActionType.Bet, amount: 1100 }); // Player 4
+  pokerGame.act({ type: 'bet', amount: 100 }); // Player 1
+  pokerGame.act({ type: 'bet', amount: 200 }); // Player 2
+  pokerGame.act({ type: 'bet', amount: 300 }); // Player 3
+  pokerGame.act({ type: 'bet', amount: 1100 }); // Player 4
 
   assertStrictEquals(pokerGame.players[0].chips, 900);
   assertStrictEquals(pokerGame.players[1].chips, 800);
@@ -213,9 +213,9 @@ Deno.test('act() handles player switching', () => {
   pokerGame.start();
 
   assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
-  pokerGame.act({ type: ActionType.Bet, amount: 100 });
+  pokerGame.act({ type: 'bet', amount: 100 });
   assertEquals(pokerGame.playerInAction, pokerGame.players[1]);
-  pokerGame.act({ type: ActionType.Bet, amount: 100 });
+  pokerGame.act({ type: 'bet', amount: 100 });
   assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
 });
 
@@ -226,7 +226,7 @@ Deno.test('Min bets handled', async (t) => {
     });
     pokerGame.start();
     assertStrictEquals(pokerGame.minBet, 50);
-    pokerGame.act({ type: ActionType.Bet, amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
     assertStrictEquals(pokerGame.minBet, 100);
   });
 
@@ -236,7 +236,7 @@ Deno.test('Min bets handled', async (t) => {
     });
     pokerGame.start();
     assertStrictEquals(pokerGame.minBet, 0);
-    pokerGame.act({ type: ActionType.Bet, amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
     assertStrictEquals(pokerGame.minBet, 100);
   });
 
@@ -248,7 +248,7 @@ Deno.test('Min bets handled', async (t) => {
     assertStrictEquals(pokerGame.minBet, 50);
     assertThrows(
       () => {
-        pokerGame.act({ type: ActionType.Bet, amount: 25 });
+        pokerGame.act({ type: 'bet', amount: 25 });
       },
       AssertionError,
       'Bet is too small. Min bet is 50.',

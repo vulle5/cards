@@ -1,7 +1,7 @@
 import Blinds from './models/Blinds.ts';
 import FrenchCard from './models/FrenchCard.ts';
 import PokerPlayer from './models/PokerPlayer.ts';
-import PokerGame, { ActionType } from './models/PokerGame.ts';
+import PokerGame from './models/PokerGame.ts';
 
 const pokerGame = new PokerGame({
   players: [
@@ -14,7 +14,7 @@ const pokerGame = new PokerGame({
 });
 
 pokerGame.start();
-pokerGame.act({ type: ActionType.Bet, amount: 100 });
-pokerGame.act({ type: ActionType.Bet, amount: 400 });
-pokerGame.act({ type: ActionType.Bet, amount: 750 });
+pokerGame.act({ type: 'bet', amount: 100 });
+pokerGame.act({ type: 'bet', amount: 400 });
+pokerGame.act({ type: 'bet', amount: 750 });
 console.log(pokerGame.pot);

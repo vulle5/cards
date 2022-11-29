@@ -203,13 +203,7 @@ export interface PokerGameParameters {
   players: PokerPlayer<FrenchCard>[];
 }
 
-export enum ActionType {
-  Bet = 'bet',
-  Call = 'call',
-  Check = 'check',
-  Fold = 'fold',
-  Raise = 'raise',
-}
+export type ActionType = 'raise' | 'call' | 'bet' | 'check' | 'fold';
 
 export interface Action {
   type: ActionType;
