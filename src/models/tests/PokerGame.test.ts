@@ -3,11 +3,11 @@ import {
   AssertionError,
   assertStrictEquals,
   assertThrows,
-} from "testing/asserts.ts";
-import Blinds from "../Blinds.ts";
-import FrenchCard from "../FrenchCard.ts";
-import PokerGame, { PokerGameParameters } from "../PokerGame.ts";
-import PokerPlayer from "../PokerPlayer.ts";
+} from 'testing/asserts.ts';
+import Blinds from '../Blinds.ts';
+import FrenchCard from '../FrenchCard.ts';
+import PokerGame, { PokerGameParameters } from '../PokerGame.ts';
+import PokerPlayer from '../PokerPlayer.ts';
 
 /**
  * Creates a PokerGame instance with the given parameters.
@@ -18,15 +18,15 @@ import PokerPlayer from "../PokerPlayer.ts";
 const createPokerGame = (params?: Partial<PokerGameParameters>) =>
   new PokerGame({
     players: [
-      new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 }),
-      new PokerPlayer<FrenchCard>("Player 2", { chips: 1000 }),
-      new PokerPlayer<FrenchCard>("Player 3", { chips: 1000 }),
-      new PokerPlayer<FrenchCard>("Player 4", { chips: 1000 }),
+      new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
+      new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
+      new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
+      new PokerPlayer<FrenchCard>('Player 4', { chips: 1000 }),
     ],
     ...params,
   });
 
-Deno.test("PokerGame - constructor", async (t) => {
+Deno.test('PokerGame - constructor', async (t) => {
   const pokerGame = createPokerGame({
     blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
     maxPlayers: 5,
@@ -40,133 +40,133 @@ Deno.test("PokerGame - constructor", async (t) => {
   assertStrictEquals(pokerGame.largestBet, 0);
   assertStrictEquals(pokerGame.maxPlayers, 5);
 
-  await t.step("does not allow game", async (t) => {
-    await t.step("with max players less than 2", () => {
+  await t.step('does not allow game', async (t) => {
+    await t.step('with max players less than 2', () => {
       assertThrows(() => createPokerGame({ maxPlayers: 1 }));
     });
 
-    await t.step("with less than two players", () => {
+    await t.step('with less than two players', () => {
       assertThrows(() => createPokerGame({ players: [] }));
       assertThrows(
         () =>
           createPokerGame({
-            players: [new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 })],
+            players: [new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 })],
           }),
         AssertionError,
-        "Must have at least 2 players."
+        'Must have at least 2 players.',
       );
     });
 
-    await t.step("with too many players", () => {
+    await t.step('with too many players', () => {
       assertThrows(
         () =>
           createPokerGame({
             players: [
-              new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 }),
-              new PokerPlayer<FrenchCard>("Player 2", { chips: 1000 }),
-              new PokerPlayer<FrenchCard>("Player 3", { chips: 1000 }),
+              new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
+              new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
+              new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
             ],
             maxPlayers: 2,
           }),
         AssertionError,
-        "Too many players. Max is 2."
+        'Too many players. Max is 2.',
       );
     });
   });
 });
 
-Deno.test("In game with more than 2 players", async (t) => {
-  await t.step("with 3 players", async (t) => {
+Deno.test('In game with more than 2 players', async (t) => {
+  await t.step('with 3 players', async (t) => {
     const pokerGame: PokerGame = createPokerGame({
       players: [
-        new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 }),
-        new PokerPlayer<FrenchCard>("Player 2", { chips: 1000 }),
-        new PokerPlayer<FrenchCard>("Player 3", { chips: 1000 }),
+        new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
+        new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
+        new PokerPlayer<FrenchCard>('Player 3', { chips: 1000 }),
       ],
     });
     assertStrictEquals(pokerGame.players.length, 3);
 
-    await t.step("dealer is last in the players array", () => {
+    await t.step('dealer is last in the players array', () => {
       assertEquals<PokerPlayer<FrenchCard>>(
         pokerGame.players[2],
-        pokerGame.dealer
+        pokerGame.dealer,
       );
     });
 
-    await t.step("small blind player is second last", () => {
+    await t.step('small blind player is second last', () => {
       assertEquals<PokerPlayer<FrenchCard>>(
         pokerGame.players[1],
-        pokerGame.smallBlindPlayer
+        pokerGame.smallBlindPlayer,
       );
     });
 
-    await t.step("big blind player is third last", () => {
+    await t.step('big blind player is third last', () => {
       assertEquals<PokerPlayer<FrenchCard>>(
         pokerGame.players[0],
-        pokerGame.bigBlindPlayer
+        pokerGame.bigBlindPlayer,
       );
     });
   });
 
-  await t.step("with 4 or more players", async (t) => {
+  await t.step('with 4 or more players', async (t) => {
     const pokerGame: PokerGame = createPokerGame();
     assertStrictEquals(pokerGame.players.length, 4);
 
-    await t.step("dealer is last in the players array", () => {
+    await t.step('dealer is last in the players array', () => {
       assertEquals<PokerPlayer<FrenchCard>>(
         pokerGame.players[3],
-        pokerGame.dealer
+        pokerGame.dealer,
       );
     });
 
-    await t.step("small blind player is second last", () => {
+    await t.step('small blind player is second last', () => {
       assertEquals<PokerPlayer<FrenchCard>>(
         pokerGame.players[2],
-        pokerGame.smallBlindPlayer
+        pokerGame.smallBlindPlayer,
       );
     });
 
-    await t.step("big blind player is third last", () => {
+    await t.step('big blind player is third last', () => {
       assertEquals<PokerPlayer<FrenchCard>>(
         pokerGame.players[1],
-        pokerGame.bigBlindPlayer
+        pokerGame.bigBlindPlayer,
       );
     });
   });
 });
 
-Deno.test("In game with 2 players", async (t) => {
+Deno.test('In game with 2 players', async (t) => {
   const pokerGame: PokerGame = createPokerGame({
     players: [
-      new PokerPlayer<FrenchCard>("Player 1", { chips: 1000 }),
-      new PokerPlayer<FrenchCard>("Player 2", { chips: 1000 }),
+      new PokerPlayer<FrenchCard>('Player 1', { chips: 1000 }),
+      new PokerPlayer<FrenchCard>('Player 2', { chips: 1000 }),
     ],
   });
   assertStrictEquals(pokerGame.players.length, 2);
 
-  await t.step("dealer is last in the players array", () => {
+  await t.step('dealer is last in the players array', () => {
     assertEquals<PokerPlayer<FrenchCard>>(
       pokerGame.players[1],
-      pokerGame.dealer
+      pokerGame.dealer,
     );
   });
 
-  await t.step("small blind player is the dealer", () => {
+  await t.step('small blind player is the dealer', () => {
     assertEquals<PokerPlayer<FrenchCard>>(
       pokerGame.dealer,
-      pokerGame.smallBlindPlayer
+      pokerGame.smallBlindPlayer,
     );
   });
 
-  await t.step("big blind is the first player", () => {
+  await t.step('big blind is the first player', () => {
     assertEquals<PokerPlayer<FrenchCard>>(
       pokerGame.players[0],
-      pokerGame.bigBlindPlayer
+      pokerGame.bigBlindPlayer,
     );
   });
 });
 
-Deno.test("start() handles pre-game actions", () => {
+Deno.test('start() handles pre-game actions', () => {
   const pokerGame: PokerGame = createPokerGame({
     blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
   });
@@ -191,14 +191,14 @@ Deno.test("start() handles pre-game actions", () => {
   assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
 });
 
-Deno.test("act() handles bet action", () => {
+Deno.test('act() handles bet action', () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
-  pokerGame.act({ type: "bet", amount: 100 }); // Player 1
-  pokerGame.act({ type: "bet", amount: 200 }); // Player 2
-  pokerGame.act({ type: "bet", amount: 300 }); // Player 3
-  pokerGame.act({ type: "bet", amount: 1100 }); // Player 4
+  pokerGame.act({ type: 'bet', amount: 100 }); // Player 1
+  pokerGame.act({ type: 'bet', amount: 200 }); // Player 2
+  pokerGame.act({ type: 'bet', amount: 300 }); // Player 3
+  pokerGame.act({ type: 'bet', amount: 1100 }); // Player 4
 
   assertStrictEquals(pokerGame.players[0].chips, 900);
   assertStrictEquals(pokerGame.players[1].chips, 800);
@@ -206,39 +206,39 @@ Deno.test("act() handles bet action", () => {
   assertStrictEquals(pokerGame.players[3].chips, 0);
 });
 
-Deno.test("act() handles player switching", () => {
+Deno.test('act() handles player switching', () => {
   const pokerGame: PokerGame = createPokerGame();
   pokerGame.start();
 
   assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
-  pokerGame.act({ type: "bet", amount: 100 });
+  pokerGame.act({ type: 'bet', amount: 100 });
   assertEquals(pokerGame.playerInAction, pokerGame.players[1]);
-  pokerGame.act({ type: "bet", amount: 100 });
+  pokerGame.act({ type: 'bet', amount: 100 });
   assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
 });
 
-Deno.test("Min bets handled", async (t) => {
-  await t.step("if game has blinds", () => {
+Deno.test('Min bets handled', async (t) => {
+  await t.step('if game has blinds', () => {
     const pokerGame: PokerGame = createPokerGame({
       blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
     });
     pokerGame.start();
     assertStrictEquals(pokerGame.largestBet, 50);
-    pokerGame.act({ type: "bet", amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
     assertStrictEquals(pokerGame.largestBet, 100);
   });
 
-  await t.step("if game has no blinds", () => {
+  await t.step('if game has no blinds', () => {
     const pokerGame: PokerGame = createPokerGame({
       blinds: undefined,
     });
     pokerGame.start();
     assertStrictEquals(pokerGame.largestBet, 0);
-    pokerGame.act({ type: "bet", amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
     assertStrictEquals(pokerGame.largestBet, 100);
   });
 
-  await t.step("if bet is lower than current min bet", () => {
+  await t.step('if bet is lower than current min bet', () => {
     const pokerGame: PokerGame = createPokerGame({
       blinds: new Blinds({ smallBlind: 25, bigBlind: 50, ante: 10 }),
     });
@@ -246,54 +246,54 @@ Deno.test("Min bets handled", async (t) => {
     assertStrictEquals(pokerGame.largestBet, 50);
     assertThrows(
       () => {
-        pokerGame.act({ type: "bet", amount: 25 });
+        pokerGame.act({ type: 'bet', amount: 25 });
       },
       AssertionError,
-      "Bet is too small. Min bet for player is 50."
+      'Bet is too small. Min bet for player is 50.',
     );
   });
 });
 
-Deno.test("roundOver() handles ", async (t) => {
-  await t.step("returns false if all players have not acted", () => {
+Deno.test('roundOver() handles ', async (t) => {
+  await t.step('returns false if all players have not acted', () => {
     const pokerGame: PokerGame = createPokerGame();
     pokerGame.start();
     assertStrictEquals(pokerGame.roundOver(), false);
   });
 
-  await t.step("returns false if player raised", () => {
+  await t.step('returns false if player raised', () => {
     const pokerGame: PokerGame = createPokerGame();
     pokerGame.start();
-    pokerGame.act({ type: "bet", amount: 100 });
-    pokerGame.act({ type: "bet", amount: 100 });
-    pokerGame.act({ type: "bet", amount: 100 });
-    pokerGame.act({ type: "bet", amount: 200 });
+    pokerGame.act({ type: 'bet', amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 200 });
     assertStrictEquals(pokerGame.roundOver(), false);
   });
 
-  await t.step("returns true if all players have bet equally", () => {
+  await t.step('returns true if all players have bet equally', () => {
     const pokerGame: PokerGame = createPokerGame({
       blinds: new Blinds({ smallBlind: 0, bigBlind: 0, ante: 25 }),
     });
     pokerGame.start();
-    pokerGame.act({ type: "bet", amount: 100 });
-    pokerGame.act({ type: "bet", amount: 100 });
-    pokerGame.act({ type: "bet", amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
     assertStrictEquals(pokerGame.roundOver(), false);
-    pokerGame.act({ type: "bet", amount: 100 });
+    pokerGame.act({ type: 'bet', amount: 100 });
     assertStrictEquals(pokerGame.roundOver(), true);
   });
 
-  await t.step("returns true if all players are all in", () => {
+  await t.step('returns true if all players are all in', () => {
     const pokerGame: PokerGame = createPokerGame({
       blinds: new Blinds({ smallBlind: 0, bigBlind: 0, ante: 25 }),
     });
     pokerGame.start();
-    pokerGame.act({ type: "bet", amount: 975 });
-    pokerGame.act({ type: "fold" });
-    pokerGame.act({ type: "fold" });
+    pokerGame.act({ type: 'bet', amount: 975 });
+    pokerGame.act({ type: 'fold' });
+    pokerGame.act({ type: 'fold' });
     assertStrictEquals(pokerGame.roundOver(), false);
-    pokerGame.act({ type: "bet", amount: 975 });
+    pokerGame.act({ type: 'bet', amount: 975 });
     assertStrictEquals(pokerGame.roundOver(), true);
   });
 });

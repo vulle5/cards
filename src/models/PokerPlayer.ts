@@ -8,7 +8,7 @@ class PokerPlayer<T> {
   #chips = 0;
   folded = false;
   #game?: PokerGame;
-  currentBet = 0; // Bets made in the current betting round
+  currentRoundBets = 0; // Bets made in the current betting round
 
   constructor(
     name: string,
@@ -113,7 +113,7 @@ class PokerPlayer<T> {
       this.collectChips(amount);
       this.game.largestBet = amount;
     }
-    this.currentBet += amount;
+    this.currentRoundBets += amount;
   }
 
   // TODO: Implement method
@@ -140,7 +140,10 @@ class PokerPlayer<T> {
    */
   check() {
     assert(this.isActive(), 'Player is not active (folded or no chips).');
-    assert(this.currentBet < this.#game!.largestBet, 'Player has already bet.');
+    assert(
+      this.currentRoundBets < this.#game!.largestBet,
+      'Player has already bet.',
+    );
   }
 }
 

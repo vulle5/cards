@@ -1,9 +1,9 @@
-import { assert } from "testing/asserts.ts";
-import Blinds from "./Blinds.ts";
-import FrenchCard, { Value } from "./FrenchCard.ts";
-import PokerPlayer from "./PokerPlayer.ts";
-import PokerDeck from "./PokerDeck.ts";
-import * as PokerGameErrors from "./PokerGameErrors.ts";
+import { assert } from 'testing/asserts.ts';
+import Blinds from './Blinds.ts';
+import FrenchCard, { Value } from './FrenchCard.ts';
+import PokerPlayer from './PokerPlayer.ts';
+import PokerDeck from './PokerDeck.ts';
+import * as PokerGameErrors from './PokerGameErrors.ts';
 
 class PokerGame {
   blinds: Blinds;
@@ -11,7 +11,7 @@ class PokerGame {
   #deck: PokerDeck;
   #handSize = 2;
   #maxPlayers;
-  #largestBet = 0; // The largest bet in the current round of betting.
+  #largestBet = 0;
   #players: PokerPlayer<FrenchCard>[];
   #playerInAction: PokerPlayer<FrenchCard>;
   #pot = 0;
@@ -29,11 +29,11 @@ class PokerGame {
     this.#playerInAction = this.players.at(0)!;
     this.#registerPlayers();
 
-    assert(this.#maxPlayers > 1, "Max players must be greater than 1.");
-    assert(this.#players.length >= 2, "Must have at least 2 players.");
+    assert(this.#maxPlayers > 1, 'Max players must be greater than 1.');
+    assert(this.#players.length >= 2, 'Must have at least 2 players.');
     assert(
       this.#players.length <= this.#maxPlayers,
-      `Too many players. Max is ${this.#maxPlayers}.`
+      `Too many players. Max is ${this.#maxPlayers}.`,
     );
   }
 
@@ -56,12 +56,12 @@ class PokerGame {
     return this.#playerInAction;
   }
   get dealer(): PokerPlayer<FrenchCard> {
-    assert(this.#players.length >= 1, "Must have at least 1 player.");
+    assert(this.#players.length >= 1, 'Must have at least 1 player.');
 
     return this.#players.at(-1)!;
   }
   get smallBlindPlayer(): PokerPlayer<FrenchCard> {
-    assert(this.#players.length >= 1, "Must have at least 1 player.");
+    assert(this.#players.length >= 1, 'Must have at least 1 player.');
 
     if (this.players.length >= 3) {
       return this.#players.at(-2)!;
@@ -70,7 +70,7 @@ class PokerGame {
     }
   }
   get bigBlindPlayer(): PokerPlayer<FrenchCard> {
-    assert(this.#players.length >= 1, "Must have at least 1 player.");
+    assert(this.#players.length >= 1, 'Must have at least 1 player.');
 
     if (this.players.length >= 3) {
       return this.#players.at(-3)!;
@@ -89,7 +89,7 @@ class PokerGame {
     return this.#pot;
   }
   set pot(amount: number) {
-    assert(amount >= 0, "Amount must be greater than or equal to 0.");
+    assert(amount >= 0, 'Amount must be greater than or equal to 0.');
 
     this.#pot = amount;
   }
@@ -128,8 +128,8 @@ class PokerGame {
    * @throws Error if the player is already in the game.
    */
   addPlayer(player: PokerPlayer<FrenchCard>) {
-    assert(this.gameFull(), "Game is full.");
-    assert(player.inGame(), "Player is already in the game.");
+    assert(this.gameFull(), 'Game is full.');
+    assert(player.inGame(), 'Player is already in the game.');
 
     this.#players.push(player);
   }
@@ -140,7 +140,7 @@ class PokerGame {
    * @returns minimum bet amount.
    */
   minBetForPlayer<T>(player: PokerPlayer<T>): number {
-    return this.largestBet - player.currentBet;
+    return this.largestBet - player.currentRoundBets;
   }
 
   start() {
@@ -153,27 +153,27 @@ class PokerGame {
     const player = this.playerInAction;
 
     if (player) {
-      assert(player.isActive(), "Player is not active.");
+      assert(player.isActive(), 'Player is not active.');
 
       switch (action.type) {
-        case "raise":
-        case "bet":
+        case 'raise':
+        case 'bet':
           player.bet(action.amount ?? 0);
           break;
-        case "call":
+        case 'call':
           player.call();
           break;
-        case "check":
+        case 'check':
           player.check();
           break;
-        case "fold":
+        case 'fold':
           player.fold();
           break;
       }
 
       this.#setNextPlayerInAction();
     } else {
-      throw new PokerGameErrors.GameStateError("No player in action.");
+      throw new PokerGameErrors.GameStateError('No player in action.');
     }
   }
 
@@ -187,8 +187,8 @@ class PokerGame {
     this.bigBlindPlayer.collectChips(this.blinds.bigBlind);
     this.smallBlindPlayer.collectChips(this.blinds.smallBlind);
     // Set the current bet for each player to the amount of the blinds.
-    this.bigBlindPlayer.currentBet = this.blinds.bigBlind;
-    this.smallBlindPlayer.currentBet = this.blinds.smallBlind;
+    this.bigBlindPlayer.currentRoundBets = this.blinds.bigBlind;
+    this.smallBlindPlayer.currentRoundBets = this.blinds.smallBlind;
     // Take ante from all of the players
     // Ante is considered a "dead" bet, it does not count towards the pot.
     this.players.forEach((player) => {
@@ -196,8 +196,11 @@ class PokerGame {
     });
     // Check what blind was the largest and set the largest bet to that amount.
     this.#largestBet = this.#players.reduce(
-      (acc, player) => (player.currentBet > acc ? player.currentBet : acc),
-      0
+      (
+        acc,
+        player,
+      ) => (player.currentRoundBets > acc ? player.currentRoundBets : acc),
+      0,
     );
   }
 
@@ -208,7 +211,7 @@ class PokerGame {
     // TODO: Does not check if the player is active.
     const nextPlayerInAction =
       activePlayers.at(activePlayers.indexOf(this.playerInAction) + 1) ??
-      activePlayers.at(0);
+        activePlayers.at(0);
     if (nextPlayerInAction) {
       this.#playerInAction = nextPlayerInAction;
     }
@@ -240,7 +243,7 @@ export interface PokerGameParameters {
   players: PokerPlayer<FrenchCard>[];
 }
 
-export type ActionType = "raise" | "call" | "bet" | "check" | "fold";
+export type ActionType = 'raise' | 'call' | 'bet' | 'check' | 'fold';
 
 export interface Action {
   type: ActionType;
