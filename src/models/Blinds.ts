@@ -12,6 +12,10 @@ class Blinds {
     this.bigBlind = bigBlind;
     this.ante = ante;
   }
+
+  get total() {
+    return this.smallBlind + this.bigBlind + this.ante;
+  }
 }
 
 interface BlindsParameters {

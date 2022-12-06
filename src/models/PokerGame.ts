@@ -1,42 +1,39 @@
-import { assert } from 'testing/asserts.ts';
-import Blinds from './Blinds.ts';
-import FrenchCard, { Value } from './FrenchCard.ts';
-import PokerPlayer from './PokerPlayer.ts';
-import PokerDeck from './PokerDeck.ts';
-import * as PokerGameErrors from './PokerGameErrors.ts';
+import { assert } from "testing/asserts.ts";
+import Blinds from "./Blinds.ts";
+import FrenchCard, { Value } from "./FrenchCard.ts";
+import PokerPlayer from "./PokerPlayer.ts";
+import PokerDeck from "./PokerDeck.ts";
+import * as PokerGameErrors from "./PokerGameErrors.ts";
 
 class PokerGame {
   blinds: Blinds;
   #board: FrenchCard[] = [];
-  #cardRanks: Value[];
   #deck: PokerDeck;
   #handSize = 2;
   #maxPlayers;
-  #minBet = 0;
+  #largestBet = 0; // The largest bet in the current round of betting.
   #players: PokerPlayer<FrenchCard>[];
   #playerInAction: PokerPlayer<FrenchCard>;
   #pot = 0;
 
   constructor({
     blinds = new Blinds(),
-    cardRanks = defaultCardRanks,
     deck = new PokerDeck(),
     maxPlayers = 8,
     players,
   }: PokerGameParameters) {
     this.blinds = blinds;
-    this.#cardRanks = cardRanks;
     this.#deck = deck;
     this.#maxPlayers = maxPlayers;
     this.#players = players;
     this.#playerInAction = this.players.at(0)!;
     this.#registerPlayers();
 
-    assert(this.#maxPlayers > 1, 'Max players must be greater than 1.');
-    assert(this.#players.length >= 2, 'Must have at least 2 players.');
+    assert(this.#maxPlayers > 1, "Max players must be greater than 1.");
+    assert(this.#players.length >= 2, "Must have at least 2 players.");
     assert(
       this.#players.length <= this.#maxPlayers,
-      `Too many players. Max is ${this.#maxPlayers}.`,
+      `Too many players. Max is ${this.#maxPlayers}.`
     );
   }
 
@@ -49,9 +46,6 @@ class PokerGame {
   get handSize() {
     return this.#handSize;
   }
-  get cardRanks() {
-    return this.#cardRanks;
-  }
   get players() {
     return this.#players;
   }
@@ -62,9 +56,13 @@ class PokerGame {
     return this.#playerInAction;
   }
   get dealer(): PokerPlayer<FrenchCard> {
+    assert(this.#players.length >= 1, "Must have at least 1 player.");
+
     return this.#players.at(-1)!;
   }
   get smallBlindPlayer(): PokerPlayer<FrenchCard> {
+    assert(this.#players.length >= 1, "Must have at least 1 player.");
+
     if (this.players.length >= 3) {
       return this.#players.at(-2)!;
     } else {
@@ -72,6 +70,8 @@ class PokerGame {
     }
   }
   get bigBlindPlayer(): PokerPlayer<FrenchCard> {
+    assert(this.#players.length >= 1, "Must have at least 1 player.");
+
     if (this.players.length >= 3) {
       return this.#players.at(-3)!;
     } else {
@@ -79,17 +79,17 @@ class PokerGame {
     }
   }
 
-  get minBet() {
-    return this.#minBet;
+  get largestBet() {
+    return this.#largestBet;
   }
-  set minBet(amount: number) {
-    this.#minBet = amount;
+  set largestBet(amount: number) {
+    this.#largestBet = amount;
   }
   get pot() {
     return this.#pot;
   }
   set pot(amount: number) {
-    assert(amount >= 0, 'Amount must be greater than or equal to 0.');
+    assert(amount >= 0, "Amount must be greater than or equal to 0.");
 
     this.#pot = amount;
   }
@@ -99,16 +99,48 @@ class PokerGame {
   }
 
   /**
+   * Returns true if the round of betting is over.
+   * @note This does not mean the game or hand is over.
+   */
+  roundOver(): boolean {
+    const activePlayers = this.activePlayers();
+    // TODO: This condition should end the round. Implement method that checks if hand is over.
+    if (activePlayers.length === 1) {
+      return true;
+    }
+    if (activePlayers.every((player) => player.allIn())) {
+      return true;
+    }
+    if (
+      this.blinds.total > 0 &&
+      activePlayers.every((player) => this.minBetForPlayer(player) === 0)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Adds a player to the game.
    * @param player The player to add.
    * @throws Error if the game is full.
    * @throws Error if the player is already in the game.
    */
   addPlayer(player: PokerPlayer<FrenchCard>) {
-    assert(this.gameFull(), 'Game is full.');
-    assert(player.inGame(), 'Player is already in the game.');
+    assert(this.gameFull(), "Game is full.");
+    assert(player.inGame(), "Player is already in the game.");
 
     this.#players.push(player);
+  }
+
+  /**
+   * The amount a player must bet this round to stay in the game.
+   * @param player The player to check.
+   * @returns minimum bet amount.
+   */
+  minBetForPlayer<T>(player: PokerPlayer<T>): number {
+    return this.largestBet - player.currentBet;
   }
 
   start() {
@@ -121,25 +153,27 @@ class PokerGame {
     const player = this.playerInAction;
 
     if (player) {
-      assert(player.isActive(), 'Player is not active.');
+      assert(player.isActive(), "Player is not active.");
 
       switch (action.type) {
-        case 'raise':
-        case 'call':
-        case 'bet':
+        case "raise":
+        case "bet":
           player.bet(action.amount ?? 0);
           break;
-        case 'check':
+        case "call":
+          player.call();
+          break;
+        case "check":
           player.check();
           break;
-        case 'fold':
+        case "fold":
           player.fold();
           break;
       }
 
       this.#setNextPlayerInAction();
     } else {
-      throw new PokerGameErrors.GameStateError('No player in action.');
+      throw new PokerGameErrors.GameStateError("No player in action.");
     }
   }
 
@@ -152,33 +186,36 @@ class PokerGame {
   #collectForcedBets() {
     this.bigBlindPlayer.collectChips(this.blinds.bigBlind);
     this.smallBlindPlayer.collectChips(this.blinds.smallBlind);
+    // Set the current bet for each player to the amount of the blinds.
+    this.bigBlindPlayer.currentBet = this.blinds.bigBlind;
+    this.smallBlindPlayer.currentBet = this.blinds.smallBlind;
     // Take ante from all of the players
+    // Ante is considered a "dead" bet, it does not count towards the pot.
     this.players.forEach((player) => {
       player.collectChips(this.blinds.ante);
     });
-    // Set the minimum bet to the big blind
-    this.#minBet = this.blinds.bigBlind;
+    // Check what blind was the largest and set the largest bet to that amount.
+    this.#largestBet = this.#players.reduce(
+      (acc, player) => (player.currentBet > acc ? player.currentBet : acc),
+      0
+    );
   }
 
   #setNextPlayerInAction() {
-    if (this.#roundOver()) return;
+    if (this.roundOver()) return;
 
-    const nextPlayerInAction = this.players.at(
-      this.players.indexOf(this.playerInAction) + 1,
-    ) ?? this.players.at(0);
+    const activePlayers = this.activePlayers();
+    // TODO: Does not check if the player is active.
+    const nextPlayerInAction =
+      activePlayers.at(activePlayers.indexOf(this.playerInAction) + 1) ??
+      activePlayers.at(0);
     if (nextPlayerInAction) {
       this.#playerInAction = nextPlayerInAction;
     }
   }
 
-  #roundOver(): boolean {
-    if (
-      this.players.length === 1 || this.players.every((player) => player.folded)
-    ) {
-      return true;
-    }
-
-    return false;
+  private activePlayers() {
+    return this.players.filter((player) => player.isActive());
   }
 
   // TODO: Implement method
@@ -203,7 +240,7 @@ export interface PokerGameParameters {
   players: PokerPlayer<FrenchCard>[];
 }
 
-export type ActionType = 'raise' | 'call' | 'bet' | 'check' | 'fold';
+export type ActionType = "raise" | "call" | "bet" | "check" | "fold";
 
 export interface Action {
   type: ActionType;
@@ -224,6 +261,6 @@ export const defaultCardRanks = [
   Value.Queen,
   Value.King,
   Value.Ace,
-];
+] as const;
 
 export default PokerGame;

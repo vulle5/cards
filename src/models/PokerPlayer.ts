@@ -64,6 +64,10 @@ class PokerPlayer<T> {
     return !this.folded && this.inGame();
   }
 
+  allIn(): boolean {
+    return this.isActive() && this.#chips === 0;
+  }
+
   /**
    * Collect chips from the player and add them to the pot.
    * @param amount The amount of chips to collect.
@@ -102,15 +106,19 @@ class PokerPlayer<T> {
       this.collectChips(this.chips);
     } else {
       assert(
-        amount >= this.game.minBet,
-        `Bet is too small. Min bet is ${this.game.minBet}.`,
+        amount >= this.game.minBetForPlayer(this),
+        `Bet is too small. Min bet for player is ${this.game.largestBet}.`,
       );
 
       this.collectChips(amount);
-      this.game.minBet = amount;
+      this.game.largestBet = amount;
     }
     this.currentBet += amount;
   }
+
+  // TODO: Implement method
+  // Automatically bet the minimum amount of chips to stay in the game.
+  call() {}
 
   /**
    * Fold the player's hand.
@@ -128,10 +136,11 @@ class PokerPlayer<T> {
    * Make player check.
    * @throws Error if the player is not in the game.
    * @throws Error if the player has already folded.
+   * @throws Error if the player has not matched the minimum bet.
    */
   check() {
     assert(this.isActive(), 'Player is not active (folded or no chips).');
-    assert(this.game!.minBet > 0, 'Minimum bet is not zero.');
+    assert(this.currentBet < this.#game!.largestBet, 'Player has already bet.');
   }
 }
 
