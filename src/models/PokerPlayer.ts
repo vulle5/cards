@@ -89,31 +89,34 @@ class PokerPlayer<T> {
 
   /**
    * Bet an amount of chips. Bets player's entire chip stack if they don't have enough chips.
-   * @param amount The amount of chips to bet.
+   * @param betAmount The amount of chips to bet.
    * @throws Error if amount is less than zero.
    * @throws Error if amount is less than minimum bet.
    * @throws Error if the player is not in the game.
    * @throws Error if the player has already folded.
    */
-  bet(amount: number) {
+  bet(betAmount: number) {
     assert(this.isActive(), 'Player is not active (folded or no chips).');
     if (!this.game) {
       throw new Error('Player is not in a game.');
     }
 
     // If player goes all in, bet all chips
-    if (amount >= this.chips) {
+    if (betAmount >= this.chips) {
       this.collectChips(this.chips);
     } else {
       assert(
-        amount >= this.game.minBetForPlayer(this),
+        betAmount >= this.game.minBetForPlayer(this),
         `Bet is too small. Min bet for player is ${this.game.largestBet}.`,
       );
 
-      this.collectChips(amount);
-      this.game.largestBet = amount;
+      this.collectChips(betAmount);
+      // Update largest bet if this bet is larger
+      if (betAmount > this.game.largestBet) {
+        this.game.largestBet = betAmount;
+      }
     }
-    this.currentRoundBets += amount;
+    this.currentRoundBets += betAmount;
   }
 
   // TODO: Implement method
