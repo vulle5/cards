@@ -207,11 +207,10 @@ class PokerGame {
   #setNextPlayerInAction() {
     if (this.roundOver()) return;
 
-    const activePlayers = this.activePlayers();
     // TODO: Does not check if the player is active.
-    const nextPlayerInAction =
-      activePlayers.at(activePlayers.indexOf(this.playerInAction) + 1) ??
-        activePlayers.at(0);
+    const nextPlayerInAction = this.players.at(
+      this.players.indexOf(this.playerInAction) + 1,
+    ) ?? this.players.at(0);
     if (nextPlayerInAction) {
       this.#playerInAction = nextPlayerInAction;
     }

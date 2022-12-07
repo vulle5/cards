@@ -284,7 +284,7 @@ Deno.test('roundOver() handles ', async (t) => {
     assertStrictEquals(pokerGame.roundOver(), true);
   });
 
-  await t.step('returns true if all players are all in', () => {
+  await t.step('returns true if all active players are all in', () => {
     const pokerGame: PokerGame = createPokerGame({
       blinds: new Blinds({ smallBlind: 0, bigBlind: 0, ante: 25 }),
     });
