@@ -74,6 +74,7 @@ class PokerPlayer<T> {
    * @throws Error if the player is not in the game.
    */
   collectChips(amount: number) {
+    // FIXME: There must be a better way to make sure game is defined
     if (!this.game) {
       throw new Error('Player is not in a game.');
     }
@@ -119,9 +120,20 @@ class PokerPlayer<T> {
     this.currentRoundBets += betAmount;
   }
 
-  // TODO: Implement method
-  // Automatically bet the minimum amount of chips to stay in the game.
-  call() {}
+  /**
+   * Call the current bet.
+   * If the player has already bet the same amount as the largest bet, do nothing.
+   * @throws Error if the player is not in the game.
+   */
+  call() {
+    if (!this.game) {
+      throw new Error('Player is not in a game.');
+    }
+
+    if (this.game.largestBet > this.currentRoundBets) {
+      this.bet(this.game.minBetForPlayer(this));
+    }
+  }
 
   /**
    * Fold the player's hand.
@@ -144,8 +156,8 @@ class PokerPlayer<T> {
   check() {
     assert(this.isActive(), 'Player is not active (folded or no chips).');
     assert(
-      this.currentRoundBets < this.#game!.largestBet,
-      'Player has already bet.',
+      this.currentRoundBets >= (this.game?.largestBet ?? false),
+      'Player must match the minimum bet to check.',
     );
   }
 }

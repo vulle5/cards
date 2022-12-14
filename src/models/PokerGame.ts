@@ -104,7 +104,7 @@ class PokerGame {
    */
   roundOver(): boolean {
     const activePlayers = this.activePlayers();
-    // TODO: This condition should end the round. Implement method that checks if hand is over.
+    // FIXME: This condition should end the round. Implement method that checks if hand is over.
     if (activePlayers.length === 1) {
       return true;
     }
@@ -207,10 +207,10 @@ class PokerGame {
   #setNextPlayerInAction() {
     if (this.roundOver()) return;
 
-    // TODO: Does not check if the player is active.
-    const nextPlayerInAction = this.players.at(
-      this.players.indexOf(this.playerInAction) + 1,
-    ) ?? this.players.at(0);
+    const nextPlayerInAction = this.players.slice(
+      this.players.indexOf(this.#playerInAction) + 1,
+    ).find((player) => player.isActive() && !player.allIn()) ??
+      this.players.at(0);
     if (nextPlayerInAction) {
       this.#playerInAction = nextPlayerInAction;
     }

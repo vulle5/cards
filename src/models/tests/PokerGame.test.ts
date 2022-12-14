@@ -217,6 +217,27 @@ Deno.test('act() handles player switching', () => {
   assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
 });
 
+Deno.test('Player switching', async (t) => {
+  await t.step('After action next active player is in action', () => {
+    const pokerGame: PokerGame = createPokerGame();
+    pokerGame.start();
+    assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
+    pokerGame.act({ type: 'bet', amount: 100 });
+    assertEquals(pokerGame.playerInAction, pokerGame.players[1]);
+    pokerGame.act({ type: 'fold' });
+    assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
+    pokerGame.act({ type: 'raise', amount: 200 });
+    assertEquals(pokerGame.playerInAction, pokerGame.players[3]);
+    pokerGame.act({ type: 'call' });
+    assertEquals(pokerGame.playerInAction, pokerGame.players[0]);
+    pokerGame.act({ type: 'call' });
+    // Skipped player at index 1 because they folded
+    assertEquals(pokerGame.playerInAction, pokerGame.players[2]);
+    pokerGame.act({ type: 'check' });
+    assertEquals(pokerGame.playerInAction, pokerGame.players[3]);
+  });
+});
+
 Deno.test('Min bets handled', async (t) => {
   await t.step('if game has blinds', () => {
     const pokerGame: PokerGame = createPokerGame({
