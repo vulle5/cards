@@ -26,7 +26,7 @@ class PokerGame {
     this.#deck = deck;
     this.#maxPlayers = maxPlayers;
     this.#players = players;
-    this.#playerInAction = this.players.at(0)!;
+    this.#playerInAction = this.players[0];
     this.#registerPlayers();
 
     assert(this.#maxPlayers > 1, 'Max players must be greater than 1.');
@@ -75,7 +75,7 @@ class PokerGame {
     if (this.players.length >= 3) {
       return this.#players.at(-3)!;
     } else {
-      return this.#players.at(0)!;
+      return this.#players[0];
     }
   }
 
@@ -104,7 +104,7 @@ class PokerGame {
    */
   roundOver(): boolean {
     const activePlayers = this.activePlayers();
-    // FIXME: This condition should end the round. Implement method that checks if hand is over.
+    // FIXME: This condition should end the hand. Implement method that checks if hand is over.
     if (activePlayers.length === 1) {
       return true;
     }
@@ -210,7 +210,7 @@ class PokerGame {
     const nextPlayerInAction = this.players.slice(
       this.players.indexOf(this.#playerInAction) + 1,
     ).find((player) => player.isActive() && !player.allIn()) ??
-      this.players.at(0);
+      this.players[0];
     if (nextPlayerInAction) {
       this.#playerInAction = nextPlayerInAction;
     }

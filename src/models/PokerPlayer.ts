@@ -156,7 +156,7 @@ class PokerPlayer<T> {
   check() {
     assert(this.isActive(), 'Player is not active (folded or no chips).');
     assert(
-      this.currentRoundBets >= (this.game?.largestBet ?? false),
+      this.currentRoundBets >= (this.game?.largestBet ?? 0),
       'Player must match the minimum bet to check.',
     );
   }
